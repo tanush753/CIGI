@@ -14,7 +14,7 @@ The test IG displays middleware message content.
 ![CIGI Test Image Generator](https://github.com/SimBlocks/CIGI/blob/main/screenshots/Test%20Image%20Generator.png)
 
 All CIGI message content is logged to **simulationsdk\Data\Applications\CIGI ImageGenerator\IGMessageLog.log**
-![CIGITestImageGenerator - Messagee Log](https://github.com/SimBlocks/CIGI/blob/main/screenshots/IGMessageLog.log.png)
+![CIGITestImageGenerator - Message Log](https://github.com/SimBlocks/CIGI/blob/main/screenshots/IGMessageLog.log.png)
 
 # Prerequisites  
 - Windows 11
@@ -24,18 +24,23 @@ All CIGI message content is logged to **simulationsdk\Data\Applications\CIGI Ima
  MSVC v143 - vs 2022 C++ x64/x86 build tools (v14.44-17.14)
 
 # Setup 
-1. Clone the repo  
-*Prefer cloning the repo rather than downloading the zip in order for submodule initialization to work.*
+## 1. Clone the Repo and Submodules
+### Option A: Clone the Repo Using TortoiseGit
+![TortoiseGit - Clone Repo](https://github.com/SimBlocks/CIGI/blob/main/screenshots/clone_cigi_using_tortoisegit.png)
 
-2. Initialize Submodules
-- a. Open a command prompt
-- b. Navigate to the cloned **CIGI** folder
+- Make sure **Recursive** is checked.
+
+### Option B: Clone the Repo Using the Command Line
+- a. Open a command prompt.
+- b. type **git clone https://github.com/SimBlocks/CIGI.git**
 - c. type **git submodule update --init --recursive**
-- d. Wait for the submodules to finish downloading
+- d. Wait for the submodules to finish downloading.
   
-3. Follow instructions in [thirdparty/README.md](https://github.com/SimBlocks/thirdparty/blob/main/README.md)
-4. Follow instructions in [simulationsdk/README.md](simulationsdk/README.md)
+## 3. Setup thirdparty  
+- Follow instructions in [thirdparty/README.md](https://github.com/SimBlocks/thirdparty/blob/main/README.md)
 
+## 4. Setup Simulation SDK  
+- Follow instructions in [simulationsdk/README.md](simulationsdk/README.md)
 
 # License
 - See [thirdparty/LICENSE.md](https://github.com/SimBlocks/thirdparty/blob/main/LICENSE)
