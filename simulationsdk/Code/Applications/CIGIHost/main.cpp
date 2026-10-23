@@ -66,6 +66,12 @@ int main()
   globals.pEventDispatcher = make_shared<CEventDispatcher>();
   globals.pLogger = make_shared<CLogger>("Host");
 
+  // CCIGIHostOptions reads g_globals to resolve .ini paths, so it must be filled before LoadOptions (same as HostEmulator)
+  g_globals.pEventDispatcher = globals.pEventDispatcher;
+  g_globals.pLogger = globals.pLogger;
+  g_globals.applicationsDataPath = globals.applicationsDataPath;
+  g_globals.librariesDataPath = globals.librariesDataPath;
+
   InitCigiLib();
   InitUtilitiesLib(globals);
 
