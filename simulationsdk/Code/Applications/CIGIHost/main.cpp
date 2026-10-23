@@ -23,11 +23,13 @@
 #include "UtilitiesLib/Logger.h"
 #include "UtilitiesLib/StopWatch.h"
 #include "UtilitiesLib/UtilitiesLib.h"
+#include "BatchRunner.h"
 #include "CIGIHostOptions.h"
 #include "CigiLib/CigiLib.h"
 #include <chrono>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <thread>
 
 #ifdef _WIN32
@@ -50,15 +52,71 @@ CHost* g_pHost = nullptr;
 const long SLEEP_MS = 17;
 
 /**
+ * @brief Runs the --batch request sequence until it finishes.
+ * @param pEventDispatcher Dispatcher the host library raises its events on; the batch runner listens there.
+ * @return 0 if every request was answered, 1 on timeout or network error, 2 if the IG never connected.
+ */
+int RunBatch(const shared_ptr<CEventDispatcher>& pEventDispatcher)
+{
+  CBatchRunner batchRunner(g_pHost);
+  pEventDispatcher->RegisterListener<HostCigiEvent>(&batchRunner);
+
+  int nExitCode = 1;
+  CStopWatch stopWatch;
+  try
+  {
+    while (!batchRunner.IsDone())
+    {
+      double fDeltaTime = stopWatch.GetElapsedSeconds();
+
+      stopWatch.Reset();
+      stopWatch.Start();
+
+      // replies are raised as events from inside Update, so batchRunner sees them before its own Update runs
+      g_pHost->Update(fDeltaTime);
+      batchRunner.Update();
+
+      double fDuration = stopWatch.GetElapsedMilliSeconds();
+
+      // maintain frame rate
+      if (fDuration < SLEEP_MS)
+      {
+        std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MS));
+      }
+    }
+    nExitCode = batchRunner.GetExitCode();
+  }
+  catch (const Poco::Net::NetException& e)
+  {
+    std::cerr << e.displayText() << std::endl;
+  }
+
+  // unregister before batchRunner goes out of scope so the dispatcher never holds a dangling pointer
+  pEventDispatcher->UnregisterListener<HostCigiEvent>(&batchRunner);
+  return nExitCode;
+}
+
+/**
  * @brief Main entry point for the CIGIHost application.
  *
  * Configures application services, loads "CIGI Host/CIGI Host.ini" from the application data directory, and
  * initializes the host. Each iteration updates the host, then handles key '1' to execute the configured script
  * or key '2' to send a reset through the script runtime.
  *
+ * With --batch, no script runs: the host connects, sends one request of each terrain query type, prints the
+ * replies and exits with the code from RunBatch().
  */
-int main()
+int main(int argc, char* argv[])
 {
+  bool bBatch = false;
+  for (int i = 1; i < argc; i++)
+  {
+    if (string(argv[i]) == "--batch")
+    {
+      bBatch = true;
+    }
+  }
+
   SGlobals globals;
   globals.applicationsDataPath = GetSdkPath() / "Data" / "Applications";
   globals.librariesDataPath = GetSdkPath() / "Data" / "Libraries";
@@ -82,6 +140,11 @@ int main()
   InitHostCigiLib(globals, g_pHost);
 
   g_pHost->Initialize(hostOptions.hostSetupOptions);
+
+  if (bBatch)
+  {
+    return RunBatch(globals.pEventDispatcher);
+  }
 
   CStopWatch stopWatch;
 

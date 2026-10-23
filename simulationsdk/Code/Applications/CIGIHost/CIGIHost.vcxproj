@@ -90,6 +90,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BatchRunner.cpp" />
     <ClCompile Include="CIGIHostOptions.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -117,6 +118,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BatchRunner.h" />
     <ClInclude Include="CIGIHostOptions.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
