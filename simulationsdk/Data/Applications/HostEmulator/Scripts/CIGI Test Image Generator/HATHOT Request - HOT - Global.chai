@@ -56,7 +56,7 @@ def OnHATResponse(data)
   logMessage("OnHATResponse");
 }
 
-def OnHOTReponse(data)
+def OnHOTResponse(data)
 {
-  logMessage("OnHOTReponse");
+  logMessage("OnHOTResponse");
 }
